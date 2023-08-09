@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>Add event</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h1>Add <b>Event</b></h1>
+    <form action="#" th:action="@{/events/addEvents}" th:object="${event}" method="post">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="form-control" type="text" th:field="${event.name}"/>
+          <div class="alert alert-warning" th:errors="${event.name}"></div>
+
+          <label>Venue</label>
+          <select class="form-control" th:field="${event.venue}">
+            <option th:each="v: ${venues}" th:value="${v.id}" th:text="${v.name}"></option>
+          </select>
+          <div class="alert alert-warning" th:errors="${event.venue}"></div>
+
+          <label>Date</label>
+          <input class="form-control" type="date" th:field="${event.date}"/>
+          <div class="alert alert-warning" th:errors="${event.date}"></div>
+
+          <label>Time</label>
+          <input class="form-control" type="time" th:field="${event.time}"/>
+          <div class="alert alert-warning" th:errors="${event.time}"></div>
+
+          <label>Description</label>
+          <textarea class="form-control" th:field="${event.description}"></textarea>
+          <div class="alert alert-warning" th:errors="${event.description}"></div>
+        </div>
+
+        <button class="btn btn-primary" type="submit"><i class="fas fa-bookmark" aria-hidden="true"></i> Save</button>
+        <a class="btn btn-warning" role="button" href="/events"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</a>
+      </form>
+  </div>
+</body>
+</html>

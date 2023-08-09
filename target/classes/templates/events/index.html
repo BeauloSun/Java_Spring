@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>All events</title>
+  <style>
+    .mapboxgl-popup-close-button{
+      display: none;
+    }
+
+    .mapboxgl-popup-content{
+      padding: 0;
+      width:180px;
+      text-align: center;
+      background: beige;
+    }
+
+    .mapboxgl-popup-content-wrapper{
+      padding: 2%;
+    }
+
+    .invisible {
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h1>All <b>Events</b></h1>
+    <div class="row pb-1">
+      <div class="col-sm-8">
+        <h3>Upcoming</h3>
+      </div>
+      <div class="col-sm-4">
+        <form th:action="@{/events}">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <a class="btn btn-success" th:href="@{/events/add}" title="Add Event" sec:authorize="isAuthenticated()">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+              </a>
+            </div>
+            <input class="form-control" placeholder='Search&hellip;' type="text" name="keyword" id="keyword" size="50" th:value="${keyword}" required />
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary" title="Search">
+                <i class="fas fa-search"></i>
+              </button>
+              <a class="btn btn-danger" th:href="@{/events}" title="Cancel">
+                <i class="fas fa-times"></i>
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th><i class="fas fa-bolt"></i> Event</th>
+          <th><i class="fas fa-map-marker-alt"></i> Venue</th>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <th><i class="fas fa-clock"></i> Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="e : ${events_upcoming}">
+          <td>
+            <a th:href="@{/events/{num}(num=${e.id})}" th:text="${e.name}">My Event</a>
+          </td>
+          <td>
+            <a th:href="@{/venues/{num}(num=${e.venue.id})}" th:text="${e.venue.name}">Event venue</a>
+          </td>
+          <td th:text="${{e.date}}">Event date</td>
+          <td th:text="${{e.time}}">Event time</td>
+        </tr>
+
+        <tr>
+          <th class="pb-1 pl-0" colspan="4" style="background-color: white;"><h3>Social <b>Feed</b></h3></th>
+        </tr>
+
+        <tr>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <th><i class="fas fa-clock"></i> Time</th>
+          <th colspan="2"><i class="fas fa-comment"></i> Comment</th>
+        </tr>
+
+        <tr th:each="e, eStat : ${events_social}" th:unless="${eStat.index >= 3}">
+          <td th:text="${{e.getDate}}" class="fd">Feed date</td>
+          <td th:text="${{e.getTime}}" class="ft">Feed time</td>
+          <td colspan="2" class="fc">
+            <a th:href="${{e.getUrl}}" th:utext="${{e.getContent}}">Feed content</a>
+          </td>
+        </tr>
+
+        <tr>
+          <th class="pb-1 pl-0" colspan="4" style="background-color: white;"><h3>Previous</h3></th>
+        </tr>
+        <tr>
+          <th><i class="fas fa-bolt"></i> Event</th>
+          <th><i class="fas fa-map-marker-alt"></i> Venue</th>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <th><i class="fas fa-clock"></i> Time</th>
+        </tr>
+        <tr th:each="e : ${events_previous}">
+          <td>
+            <a th:href="@{/events/{num}(num=${e.id})}" th:text="${e.name}">My Event</a>
+          </td>
+          <td>
+            <a th:href="@{/venues/{num}(num=${e.venue.id})}" th:text="${e.venue.name}">Event venue</a>
+          </td>
+          <td th:text="${{e.date}}">Event date</td>
+          <td th:text="${{e.time}}">Event time</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="height: 35em;" id="map"></div>
+
+    <script th:inline="javascript">
+      mapboxgl.accessToken = /*[[${accessToken}]]*/ 'default';
+      const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-2.2426, 53.4808],
+      zoom: 4
+      });
+
+      var events = /*[[${events_upcoming}]]*/ 'default';
+      // events.forEach(createMarkers);
+
+      for (let i = 0; i < events.length; i++) {
+        var colorTmp = Math.floor(Math.random()*16777215).toString(16);
+        colorTmp = "#"+colorTmp;
+        console.log(colorTmp);
+        createMarkers(events[i],colorTmp);
+      }
+
+      function createMarkers (event,color) {
+        var time = event.time;
+        if (time == null){
+          time = `<Time TBA>`
+        }
+        var popup = new mapboxgl.Popup()
+        .setText(`${event.name} ${time}`)
+        .addTo(map);
+        const marker = new mapboxgl.Marker({"color":color})
+        .setLngLat([event.venue.longitude, event.venue.latitude])
+        .addTo(map)
+        .setPopup(popup);
+
+        marker.togglePopup();
+      }
+    </script>
+
+  </div>
+
+</body>
+</html>

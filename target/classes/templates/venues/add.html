@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>Add venue</title>
+</head>
+<body>
+  <div layout:fragment="content">
+  <h1>Add <b>Venue</b></h1>
+   <form action="#" th:action="@{/venues/addVenue}" th:object="${venue}" th:method="POST">
+
+    <div class="form-group">
+      <label>Name</label>
+      <input class="form-control" type="text" th:field="${venue.name}"/>
+      <div class="alert alert-warning" th:errors="${venue.name}"></div>
+
+      <label>Address</label>
+      <input class="form-control" type="text" th:field="${venue.address}"/>
+      <div class="alert alert-warning" th:errors="${venue.address}"></div>
+
+      <label>Capacity</label>
+      <input class="form-control" type="number" th:field="${venue.capacity}"/>
+      <div class="alert alert-warning" th:errors="${venue.capacity}"></div>
+    </div>
+
+    <button class="btn btn-primary" type="submit"><i class="fas fa-bookmark" aria-hidden="true"></i> Save</button>
+    <a class="btn btn-warning" role="button" href="/venues"><i class="fas fa-ban" aria-hidden="true"></i> Cancel</a>
+     
+   </form> 
+  </div>
+</body>
+</html>

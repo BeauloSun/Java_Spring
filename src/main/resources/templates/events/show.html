@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>Event Details</title>
+  <style>
+    .mapboxgl-popup-close-button{
+      display: none;
+    }
+
+    .mapboxgl-popup-content{
+      padding: 0;
+      width:180px;
+      text-align: center;
+      background: beige;
+    }
+
+    .mapboxgl-popup-content-wrapper{
+      padding: 2%;
+    }
+  </style>
+</head>
+<body>
+  <div class="jumbotron" layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-end">
+      <h1>Event <b>Details</b></h1>
+      <div class="d-flex">
+        <button class="btn btn-primary mb-2 mr-2" role="button" onclick="history.back()"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</button>
+        <a class="btn btn-warning mb-2 mr-2" th:href="@{update/{num}(num=${id})}" sec:authorize="isAuthenticated()"><i class="fas fa-edit" aria-hidden="true"></i> Edit</a>
+        <form th:action="@{/events/{num}(num=${id})}" th:method="delete">
+          <button type="submit" class="btn btn-danger" sec:authorize="isAuthenticated()"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
+        </form>
+      </div>
+	</div>
+    <table class="table table-bordered table-hover bg-light">
+      <tbody>
+        <tr>
+          <th><i class="fas fa-bolt"></i> Event</th>
+          <td th:text="${event.name}"></td>
+        </tr>
+        <tr>
+          <th><i class="fas fa-map-marker-alt"></i> Venue</th>
+          <td th:text="${event.venue.name}" id="venueName"></td>
+        </tr>
+        <tr>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <td th:text="${event.date}"></td>
+        </tr>
+        <tr>
+          <th><i class="fas fa-clock"></i> Time</th>
+          <td th:text="${event.time}"></td>
+        </tr>
+        <tr>
+          <th><i class="fas fa-book"></i> Description</th>
+          <td th:text="${event.description}"></td>
+        </tr>
+        <tr>
+          <th><i class="fas fa-map"></i> Map</th>
+          <td><div style="height: 25em;" id="map"></div></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="alert alert-success alert-dismissible" role="alert" th:if="${message_posted}">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+      <span>
+        Your post: 
+        <strong th:text="${message_posted}">Success!</strong>
+         was posted
+      </span>
+      
+    </div>
+    
+    <form action="#" th:action="@{/events/shareEvent}" method="post">
+      <div class="form-group">
+        <label><b>Share the event!</b></label>
+        <input class="form-control" type="text" name="message" th:placeholder="${event.name}" required />
+        <input type="hidden" name="id" th:value="${event.id}"/>
+      </div>
+      <button type="submit" class="btn btn-dark">Submit Post</button>
+    </form>
+
+    <script th:inline="javascript">
+    var venueLongitude = /*[[${event.venue.longitude}]]*/ 'default';
+    var venueLatitude = /*[[${event.venue.latitude}]]*/ 'default';
+    var venueName = /*[[${event.venue.name}]]*/ 'default';
+    
+    mapboxgl.accessToken = /*[[${accessToken}]]*/ 'default';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [venueLongitude,venueLatitude],
+      zoom: 12
+    });
+
+    var popup = new mapboxgl.Popup()
+    	.setText(`${venueName}`)
+    	.addTo(map);
+    
+    const marker = new mapboxgl.Marker({"color":"#FF0000"})
+    	.setLngLat([venueLongitude, venueLatitude])
+        .addTo(map)
+        .setPopup(popup);
+    
+    marker.togglePopup();
+    </script>
+  </div>
+</body>
+</html>

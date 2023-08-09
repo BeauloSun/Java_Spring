@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/default}">
+<head>
+  <title>Error handler</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h1><span th:text="${error_title}">0</span></h1>
+
+    <p>
+      Sorry, event <span th:text="${event_id}">0</span> <span th:text="${error_msg}">0</span>.
+    </p>
+
+    <p>
+      <a class="btn btn-primary" role="button" th:href="@{/events}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Events list</a>
+    </p>
+  </div>
+</body>
+</html>
